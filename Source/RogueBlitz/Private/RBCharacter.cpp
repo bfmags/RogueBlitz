@@ -1,5 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 #include "RBCharacter.h"
+
+#include <ThirdParty/hlslcc/hlslcc/src/hlslcc_lib/ir.h>
+
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "DrawDebugHelpers.h"
@@ -60,6 +63,21 @@ void ARBCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("Lookup", this, &APawn::AddControllerPitchInput);
+
+	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ARBCharacter::PrimaryAttack);
+
+	PlayerInputComponent->BindAction("Jump", IE_Pressed,this, &ARBCharacter::Jump);
+}
+
+void ARBCharacter::PrimaryAttack()
+{
+
+	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+	const FTransform SpawnTransformMatrix = FTransform( GetControlRotation(), HandLocation);
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	
+	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTransformMatrix, SpawnParams);
 }
 
 void ARBCharacter::MoveForward(float Value)

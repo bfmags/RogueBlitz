@@ -21,12 +21,16 @@ public:
 
 protected:
 
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AActor> ProjectileClass;
+
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComponent;
 
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComponent;
-
+	
+	void PrimaryAttack();
 	void MoveForward(float Value);
 	void MoveRight(float Value);
 
