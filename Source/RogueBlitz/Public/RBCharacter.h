@@ -9,6 +9,8 @@
 // uses forward declaration (partial inclusion for incomplete type) to avoid circular
 class USpringArmComponent;
 class UCameraComponent;
+class URBInteractionComponent;
+class UAnimMontage;
 
 UCLASS()
 class ROGUEBLITZ_API ARBCharacter : public ACharacter
@@ -21,18 +23,28 @@ public:
 
 protected:
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> ProjectileClass;
 
+	UPROPERTY(EditAnywhere, Category = "Attack")
+	UAnimMontage* AttackAnim;
+	
 	UPROPERTY(VisibleAnywhere)
 	USpringArmComponent* SpringArmComponent;
 
 	UPROPERTY(VisibleAnywhere)
 	UCameraComponent* CameraComponent;
+
+	UPROPERTY(VisibleAnywhere)
+	URBInteractionComponent* InteractionComponent;
 	
 	void PrimaryAttack();
+	void PrimaryInteract();
 	void MoveForward(float Value);
 	void MoveRight(float Value);
+
+	FTimerHandle TimerHandle_PrimaryAttack;
+	void PrimaryAttack_TimeElapsed();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

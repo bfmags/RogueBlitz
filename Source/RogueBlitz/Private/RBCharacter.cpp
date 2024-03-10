@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "DrawDebugHelpers.h"
+#include "RBInteractionComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
@@ -20,6 +21,8 @@ ARBCharacter::ARBCharacter()
 	
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(SpringArmComponent);
+
+	InteractionComponent = CreateDefaultSubobject<URBInteractionComponent>("InteractionComponent");
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;
@@ -63,21 +66,33 @@ void ARBCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("Lookup", this, &APawn::AddControllerPitchInput);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed,this, &ARBCharacter::Jump);
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ARBCharacter::PrimaryAttack);
-
-	PlayerInputComponent->BindAction("Jump", IE_Pressed,this, &ARBCharacter::Jump);
+	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed,this, &ARBCharacter::PrimaryInteract);
 }
 
 void ARBCharacter::PrimaryAttack()
 {
+	PlayAnimMontage(AttackAnim);
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ARBCharacter::PrimaryAttack_TimeElapsed, 0.2f);
+}
 
-	FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
+void ARBCharacter::PrimaryAttack_TimeElapsed()
+{
+	const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
 	const FTransform SpawnTransformMatrix = FTransform( GetControlRotation(), HandLocation);
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTransformMatrix, SpawnParams);
+}
+
+void ARBCharacter::PrimaryInteract()
+{
+	if(InteractionComponent)
+	{
+		InteractionComponent->PrimaryInteract();
+	}
 }
 
 void ARBCharacter::MoveForward(float Value)
