@@ -17,15 +17,24 @@ ARBExplosiveBarrel::ARBExplosiveBarrel()
 	RootComponent = MeshComponent;
 
 	RadialForceComponent = CreateDefaultSubobject<URadialForceComponent>("RadialForceComponent");
-	RadialForceComponent->Radius = 100;
-	RadialForceComponent->ImpulseStrength = 2000;
+	RadialForceComponent->Radius = 750.0f;
+	RadialForceComponent->ImpulseStrength = 2500.0f;
 	RadialForceComponent->bImpulseVelChange = true;
-	
+
+	// Leaving this on apply force on component tick
+	RadialForceComponent->SetAutoActivate(false);
+
+	RadialForceComponent->AddCollisionChannelToAffect(ECC_WorldDynamic);
 	RadialForceComponent->SetupAttachment(MeshComponent);
 
+}
+
+void ARBExplosiveBarrel::PostInitializeComponents()
+{
 	// Callbacks
 	MeshComponent->OnComponentHit.AddDynamic(this, &ARBExplosiveBarrel::OnHitCallback);
 }
+
 
 // Called when the game starts or when spawned
 void ARBExplosiveBarrel::BeginPlay()
@@ -43,6 +52,5 @@ void ARBExplosiveBarrel::OnHitCallback(UPrimitiveComponent* HitComp, AActor* Oth
 void ARBExplosiveBarrel::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
