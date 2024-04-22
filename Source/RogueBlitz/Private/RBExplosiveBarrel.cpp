@@ -31,6 +31,7 @@ ARBExplosiveBarrel::ARBExplosiveBarrel()
 
 void ARBExplosiveBarrel::PostInitializeComponents()
 {
+	Super::PostInitializeComponents();
 	// Callbacks
 	MeshComponent->OnComponentHit.AddDynamic(this, &ARBExplosiveBarrel::OnHitCallback);
 }
