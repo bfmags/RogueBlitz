@@ -8,6 +8,7 @@
 #include "DrawDebugHelpers.h"
 #include "RBInteractionComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
 ARBCharacter::ARBCharacter()
@@ -38,11 +39,17 @@ void ARBCharacter::BeginPlay()
 void ARBCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
+	// Debug
+	//DrawDebugScreenAids();
+}
+
+void ARBCharacter::DrawDebugScreenAids() const
+{
 	// -- Rotation Visualization -- //
 	constexpr float DrawScale = 100.0f;
 	constexpr float Thickness = 5.0f;
-
+	
 	FVector LineStart = GetActorLocation();
 	// Offset to the right of pawn
 	LineStart += GetActorRightVector() * 100.0f;
@@ -80,12 +87,37 @@ void ARBCharacter::PrimaryAttack()
 
 void ARBCharacter::PrimaryAttack_TimeElapsed()
 {
+	// Get hand location
 	const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
-	const FTransform SpawnTransformMatrix = FTransform( GetControlRotation(), HandLocation);
+
+	// Perform line trace from camera to world
+	FVector CameraLocation = CameraComponent->GetComponentLocation();
+	FVector CameraDirection = GetControlRotation().Vector();
+	FHitResult HitResult;
+	
+	FCollisionObjectQueryParams ObjectQueryParams( ECC_TO_BITFIELD(ECC_WorldStatic) | ECC_TO_BITFIELD(ECC_WorldDynamic) );
+	FCollisionQueryParams CollisionParams(SCENE_QUERY_STAT(LineOfSight), true, this);
+	
+	const bool Hit = GetWorld()->LineTraceSingleByObjectType(
+	  HitResult, CameraLocation, CameraLocation + CameraDirection * MaxTraceDistance,
+		ObjectQueryParams, CollisionParams
+	);
+
+	// Determine impact location, if nothing hit set to the end of the trace
+	FVector ImpactLocation = Hit ? HitResult.ImpactPoint : CameraLocation + CameraDirection * MaxTraceDistance;
+
+	// Calculate spawn rotation based on impact location
+	FRotator SpawnRotation = UKismetMathLibrary::FindLookAtRotation(HandLocation, ImpactLocation);
+
+	// Spawn Transform with updated rotation
+	FTransform SpawnTransformMatrix(SpawnRotation, HandLocation);
+
+	// Spawn parameters
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Instigator = this;
-	
+
+	// Spawn the projectile
 	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTransformMatrix, SpawnParams);
 }
 
