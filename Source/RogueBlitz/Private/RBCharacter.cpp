@@ -77,6 +77,9 @@ void ARBCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 
 	PlayerInputComponent->BindAction("PrimaryAttack", IE_Pressed, this, &ARBCharacter::PrimaryAttack);
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed,this, &ARBCharacter::PrimaryInteract);
+
+	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &ARBCharacter::SecondaryAttack);
+	
 }
 
 void ARBCharacter::PrimaryAttack()
@@ -85,7 +88,23 @@ void ARBCharacter::PrimaryAttack()
 	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ARBCharacter::PrimaryAttack_TimeElapsed, 0.2f);
 }
 
+void ARBCharacter::SecondaryAttack()
+{
+	PlayAnimMontage(AttackAnim);
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ARBCharacter::SecondaryAttack_TimeElapsed, 0.2f);
+}
+
 void ARBCharacter::PrimaryAttack_TimeElapsed()
+{
+	FireProjectile(PrimaryAttackProjectileClass);
+}
+
+void ARBCharacter::SecondaryAttack_TimeElapsed()
+{
+	FireProjectile(SecondaryAttackProjectileClass);
+}
+
+void ARBCharacter::FireProjectile(TSubclassOf<AActor> Projectile)
 {
 	// Get hand location
 	const FVector HandLocation = GetMesh()->GetSocketLocation("Muzzle_01");
@@ -118,7 +137,7 @@ void ARBCharacter::PrimaryAttack_TimeElapsed()
 	SpawnParams.Instigator = this;
 
 	// Spawn the projectile
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnTransformMatrix, SpawnParams);
+	GetWorld()->SpawnActor<AActor>(Projectile, SpawnTransformMatrix, SpawnParams);
 }
 
 void ARBCharacter::PrimaryInteract()
