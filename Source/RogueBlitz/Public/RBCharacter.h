@@ -29,6 +29,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> SecondaryAttackProjectileClass;
 
+	UPROPERTY(EditAnywhere, Category = "Teleport")
+	TSubclassOf<AActor> PrimaryTeleportProjectileClass;
+	
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	UAnimMontage* AttackAnim;
 	
@@ -43,6 +46,7 @@ protected:
 	
 	void PrimaryAttack();
 	void SecondaryAttack();
+	void PrimaryTeleport_TimeElapsed();
 	void FireProjectile(TSubclassOf<AActor> Projectile);
 	void PrimaryInteract();
 	void MoveForward(float Value);
@@ -51,6 +55,7 @@ protected:
 	FTimerHandle TimerHandle_PrimaryAttack;
 	void PrimaryAttack_TimeElapsed();
 	void SecondaryAttack_TimeElapsed();
+	void PrimaryTeleport();
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

@@ -79,6 +79,7 @@ void ARBCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("PrimaryInteract", IE_Pressed,this, &ARBCharacter::PrimaryInteract);
 
 	PlayerInputComponent->BindAction("SecondaryAttack", IE_Pressed, this, &ARBCharacter::SecondaryAttack);
+	PlayerInputComponent->BindAction("PrimaryTeleport", IE_Pressed, this, &ARBCharacter::PrimaryTeleport);
 	
 }
 
@@ -88,20 +89,31 @@ void ARBCharacter::PrimaryAttack()
 	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ARBCharacter::PrimaryAttack_TimeElapsed, 0.2f);
 }
 
+void ARBCharacter::PrimaryAttack_TimeElapsed()
+{
+	FireProjectile(PrimaryAttackProjectileClass);
+}
+
 void ARBCharacter::SecondaryAttack()
 {
 	PlayAnimMontage(AttackAnim);
 	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ARBCharacter::SecondaryAttack_TimeElapsed, 0.2f);
 }
 
-void ARBCharacter::PrimaryAttack_TimeElapsed()
-{
-	FireProjectile(PrimaryAttackProjectileClass);
-}
-
 void ARBCharacter::SecondaryAttack_TimeElapsed()
 {
 	FireProjectile(SecondaryAttackProjectileClass);
+}
+
+void ARBCharacter::PrimaryTeleport()
+{
+	PlayAnimMontage(AttackAnim);
+	GetWorldTimerManager().SetTimer(TimerHandle_PrimaryAttack, this, &ARBCharacter::PrimaryTeleport_TimeElapsed, 0.2f);
+}
+
+void ARBCharacter::PrimaryTeleport_TimeElapsed()
+{
+	FireProjectile(PrimaryTeleportProjectileClass);
 }
 
 void ARBCharacter::FireProjectile(TSubclassOf<AActor> Projectile)
@@ -138,6 +150,7 @@ void ARBCharacter::FireProjectile(TSubclassOf<AActor> Projectile)
 
 	// Spawn the projectile
 	GetWorld()->SpawnActor<AActor>(Projectile, SpawnTransformMatrix, SpawnParams);
+
 }
 
 void ARBCharacter::PrimaryInteract()
