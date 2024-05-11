@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "RBMagicProjectile.h"
+#include "SAttributeComponent.h"
 
 // Sets default values
 ARBMagicProjectile::ARBMagicProjectile()
@@ -12,6 +13,7 @@ ARBMagicProjectile::ARBMagicProjectile()
 	RootComponent = SphereComp;
 
 	SphereComp->SetCollisionProfileName("Projectile");
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ARBMagicProjectile::OnActorOverlap);
 
 	/*SphereComp->SetCollisionObjectType(ECC_WorldDynamic);
 	SphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
@@ -26,6 +28,22 @@ ARBMagicProjectile::ARBMagicProjectile()
 	MovementComp->bInitialVelocityInLocalSpace = true;
 	MovementComp->ProjectileGravityScale = 0.0f;
 	
+}
+
+void ARBMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
+{
+	if (IsValid(OtherActor) && OtherActor != GetInstigator())
+	{
+		USAttributeComponent* AttributeComponent = Cast<USAttributeComponent>
+													(OtherActor->GetComponentByClass(USAttributeComponent::StaticClass()));
+
+		if (IsValid(AttributeComponent))
+		{
+			AttributeComponent->ApplyHealthChange(-20.0f);
+			Destroy();
+		}
+
+	}
 }
 
 // Called when the game starts or when spawned

@@ -11,6 +11,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class URBInteractionComponent;
 class UAnimMontage;
+class USAttributeComponent;
 
 UCLASS()
 class ROGUEBLITZ_API ARBCharacter : public ACharacter
@@ -22,6 +23,9 @@ public:
 	ARBCharacter();
 
 protected:
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	USAttributeComponent* AttributeComp;
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	TSubclassOf<AActor> PrimaryAttackProjectileClass;

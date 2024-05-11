@@ -7,6 +7,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "DrawDebugHelpers.h"
 #include "RBInteractionComponent.h"
+#include "SAttributeComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
@@ -24,6 +25,8 @@ ARBCharacter::ARBCharacter()
 	CameraComponent->SetupAttachment(SpringArmComponent);
 
 	InteractionComponent = CreateDefaultSubobject<URBInteractionComponent>("InteractionComponent");
+
+	AttributeComp = CreateDefaultSubobject<USAttributeComponent>("AttributeComponent");
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	bUseControllerRotationYaw = false;

@@ -27,13 +27,12 @@ ARBExplosiveBarrel::ARBExplosiveBarrel()
 	RadialForceComponent->AddCollisionChannelToAffect(ECC_WorldDynamic);
 	RadialForceComponent->SetupAttachment(MeshComponent);
 
+	MeshComponent->OnComponentHit.AddDynamic(this, &ARBExplosiveBarrel::OnHitCallback);
 }
 
 void ARBExplosiveBarrel::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	// Callbacks
-	MeshComponent->OnComponentHit.AddDynamic(this, &ARBExplosiveBarrel::OnHitCallback);
 }
 
 
