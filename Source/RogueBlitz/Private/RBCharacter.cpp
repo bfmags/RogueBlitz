@@ -32,10 +32,27 @@ ARBCharacter::ARBCharacter()
 	bUseControllerRotationYaw = false;
 }
 
+void ARBCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	AttributeComp->OnHealthChanged.AddDynamic(this, &ARBCharacter::OnHealthChanged);
+}
+
 // Called when the game starts or when spawned
 void ARBCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void ARBCharacter::OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth,
+	float Delta)
+{
+	if (NewHealth <= 0.0f && Delta < 0.0f)
+	{
+		APlayerController* PlayerController = Cast<APlayerController>(GetController());
+		DisableInput(PlayerController);
+	}
 }
 
 // Called every frame

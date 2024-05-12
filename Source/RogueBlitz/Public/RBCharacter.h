@@ -69,6 +69,11 @@ protected:
 
 	// Trace range in UU
 	const float MaxTraceDistance = 3000;
+
+	UFUNCTION()
+	void OnHealthChanged(AActor* InstigatorActor, USAttributeComponent* OwningComp, float NewHealth, float Delta);
+
+	virtual void PostInitializeComponents() override;
 	
 public:	
 	// Called every frame
