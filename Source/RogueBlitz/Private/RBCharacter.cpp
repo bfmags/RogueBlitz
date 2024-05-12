@@ -131,7 +131,8 @@ void ARBCharacter::FireProjectile(TSubclassOf<AActor> Projectile)
 	
 	FCollisionObjectQueryParams ObjectQueryParams( ECC_TO_BITFIELD(ECC_WorldStatic) | ECC_TO_BITFIELD(ECC_WorldDynamic) );
 	FCollisionQueryParams CollisionParams(SCENE_QUERY_STAT(LineOfSight), true, this);
-	
+
+	// TODO refactor to use SweepTrace
 	const bool Hit = GetWorld()->LineTraceSingleByObjectType(
 	  HitResult, CameraLocation, CameraLocation + CameraDirection * MaxTraceDistance,
 		ObjectQueryParams, CollisionParams
