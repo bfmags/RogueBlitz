@@ -7,6 +7,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Sound/SoundCue.h" 
 #include "RBMagicProjectile.generated.h"
 
 UCLASS()
@@ -31,6 +32,16 @@ protected:
 	
 	UPROPERTY(Instanced, VisibleAnywhere, BlueprintReadWrite)
 	UParticleSystemComponent* EffectComp;
+
+	// Audio effects
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	UAudioComponent* SoundComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	USoundCue* FlightAudioCue;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	USoundCue* ImpactAudioCue;
 
 	UFUNCTION()
 	void OnActorOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,

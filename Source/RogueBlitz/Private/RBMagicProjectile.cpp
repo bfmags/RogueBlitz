@@ -2,6 +2,8 @@
 
 #include "RBMagicProjectile.h"
 #include "SAttributeComponent.h"
+#include "Components/AudioComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ARBMagicProjectile::ARBMagicProjectile()
@@ -27,7 +29,12 @@ ARBMagicProjectile::ARBMagicProjectile()
 	MovementComp->bRotationFollowsVelocity = true;
 	MovementComp->bInitialVelocityInLocalSpace = true;
 	MovementComp->ProjectileGravityScale = 0.0f;
-	
+
+	// Setup Audio effects components
+	SoundComponent = CreateDefaultSubobject<UAudioComponent>("FlightSoundComponent");
+	SoundComponent->SetupAttachment(RootComponent);
+	SoundComponent->SetRelativeLocation(FVector(100.0f, 0.0f, 0.0f));
+	SoundComponent->bAutoActivate = false;
 }
 
 void ARBMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& Hit)
@@ -39,6 +46,11 @@ void ARBMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComp, AAc
 
 		if (IsValid(AttributeComponent))
 		{
+			SoundComponent->Stop();
+			if (ImpactAudioCue->IsValidLowLevelFast()) {
+				UGameplayStatics::PlaySoundAtLocation(this, ImpactAudioCue, OtherActor->GetActorLocation());
+			}
+
 			AttributeComponent->ApplyHealthChange(-20.0f);
 			Destroy();
 		}
@@ -50,7 +62,16 @@ void ARBMagicProjectile::OnActorOverlap(UPrimitiveComponent* OverlappedComp, AAc
 void ARBMagicProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if (FlightAudioCue->IsValidLowLevelFast()) {
+		SoundComponent->SetSound(FlightAudioCue);
+
+		float startTime = 9.f;
+		float volume = 1.0f;
+		float fadeTime = 1.0f;
+		SoundComponent->FadeIn(fadeTime, volume, startTime);
+	}
+
 }
 
 // Called every frame
@@ -59,4 +80,5 @@ void ARBMagicProjectile::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
+
 
